@@ -1,0 +1,66 @@
+﻿<Window x:Class="PhotoConverterV2.Dialogs.RenameDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Rename"
+        Width="420" Height="190"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        UseLayoutRounding="True"
+        Background="{DynamicResource BackgroundBrush}"
+        Loaded="Window_Loaded">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Açıklama -->
+        <TextBlock x:Name="LblHint"
+                   Grid.Row="0"
+                   Text="Files will be saved as: product_1.jpg ..."
+                   Foreground="{DynamicResource SubtleBrush}"
+                   FontSize="12"
+                   TextWrapping="Wrap"/>
+
+        <!-- Temel isim etiketi -->
+        <TextBlock x:Name="LblBaseName"
+                   Grid.Row="2"
+                   Text="Base name:"
+                   Foreground="{DynamicResource ForegroundBrush}"
+                   FontSize="13"/>
+
+        <!-- TextBox -->
+        <TextBox x:Name="TxtBaseName"
+                 Grid.Row="4"
+                 Height="32"
+                 FontSize="13"
+                 Background="{DynamicResource InputBgBrush}"
+                 Foreground="{DynamicResource ForegroundBrush}"
+                 BorderBrush="{DynamicResource BorderBrush2}"
+                 KeyDown="TxtBaseName_KeyDown"/>
+
+        <!-- OK / Cancel -->
+        <StackPanel Grid.Row="6"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button x:Name="BtnCancel"
+                    Content="Cancel"
+                    Width="80" Height="30"
+                    Style="{StaticResource SecondaryButton}"
+                    Click="BtnCancel_Click"/>
+            <Button x:Name="BtnOk"
+                    Content="OK"
+                    Width="80" Height="30"
+                    Margin="8,0,0,0"
+                    Style="{StaticResource StandardButton}"
+                    IsDefault="True"
+                    Click="BtnOk_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,33 @@
+﻿<Window x:Class="PhotoConverterV2.Dialogs.FullscreenPreview"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Background="Black"
+        UseLayoutRounding="True"
+        Cursor="Hand"
+        MouseLeftButtonUp="Window_Click"
+        KeyDown="Window_KeyDown">
+
+    <Grid>
+        <!-- Görüntü — tam ekrana sığdır, oranı koru -->
+        <Image x:Name="ImgFull"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"/>
+
+        <!-- Alt ipucu metni -->
+        <Border VerticalAlignment="Bottom"
+                HorizontalAlignment="Center"
+                Background="#80000000"
+                CornerRadius="6"
+                Padding="14,6"
+                Margin="0,0,0,24">
+            <TextBlock x:Name="LblHint"
+                       Text="Click or press ESC to close"
+                       Foreground="#ccffffff"
+                       FontSize="13"
+                       FontFamily="Segoe UI"/>
+        </Border>
+    </Grid>
+</Window>

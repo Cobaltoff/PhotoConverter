@@ -1,0 +1,580 @@
+<Window x:Class="PhotoConverterV2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="📷 Photo Converter"
+        Width="1100" Height="700"
+        MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        Background="{DynamicResource BackgroundBrush}"
+        Loaded="Window_Loaded"
+        Drop="Window_Drop"
+        AllowDrop="True">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Header -->
+            <RowDefinition Height="52"/>
+            <!-- Main content -->
+            <RowDefinition Height="*"/>
+            <!-- Footer -->
+            <RowDefinition Height="42"/>
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════════════════════════════════════════
+             HEADER
+        ══════════════════════════════════════════════════ -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource PanelBgBrush}"
+                BorderBrush="{DynamicResource BorderBrush2}"
+                BorderThickness="0,0,0,1">
+            <Grid Margin="16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Başlık -->
+                <TextBlock Grid.Column="0"
+                           Text="📷 Photo Converter"
+                           FontSize="17"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource ForegroundBrush}"
+                           VerticalAlignment="Center"/>
+
+                
+
+                <!-- Sağ: Dil + Tema butonları -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+
+                    <TextBlock Text="Created by KadirKaan"
+           FontSize="8"
+           Foreground="{DynamicResource SubtleBrush}"
+           VerticalAlignment="Center"
+           Margin="0,0,12,0"/>
+                    <!-- Dil butonu -->
+                    <Button x:Name="BtnLanguage"
+                            Width="60" Height="30"
+                            Padding="0"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="BtnLanguage_Click"
+                            ToolTip="Toggle Language / Dili Değiştir">
+                        <TextBlock Text="TR/EN"
+                                   FontSize="12"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                    </Button>
+                    <!-- Tema butonu -->
+                    <Button x:Name="BtnTheme"
+                            Width="34" Height="30"
+                            Padding="0"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="BtnTheme_Click"
+                            ToolTip="Toggle Dark/Light Theme">
+                        <Viewbox Width="16" Height="16" Stretch="Uniform">
+                            <TextBlock x:Name="ThemeIcon"
+                                       Text="🌙"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                        </Viewbox>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════
+             ANA İÇERİK
+        ══════════════════════════════════════════════════ -->
+        <Grid Grid.Row="1" Margin="12,10,12,0">
+            <Grid.ColumnDefinitions>
+                <!-- Sol ana panel -->
+                <ColumnDefinition Width="*"/>
+                <!-- Sağ önizleme paneli -->
+                <ColumnDefinition x:Name="PreviewColumn" Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ── SOL PANEL ─────────────────────────────── -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <!-- Ayarlar satırı -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Drop zone / Thumbnails -->
+                    <RowDefinition Height="*"/>
+                    <!-- Output + Rename + butonlar -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- ── AYARLAR SATIRI ──────────────────────── -->
+                <Border Grid.Row="0"
+                        Style="{StaticResource PanelBorder}"
+                        Padding="12,10"
+                        Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 1. Satır: Platform + Format + ⚙ Profiles -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Platform ComboBox -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock x:Name="LblPlatform"
+                                           Text="Platform (Optional)"
+                                           Foreground="{DynamicResource SubtleBrush}"
+                                           FontSize="11"
+                                           Margin="0,0,0,3"/>
+                                <ComboBox x:Name="CboPlatform"
+                                          Height="30"
+                                          SelectionChanged="CboPlatform_SelectionChanged"/>
+                            </StackPanel>
+
+                            <!-- Output Format + EXIF Toggle -->
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <TextBlock x:Name="LblFormat"
+                                               Text="Output Format"
+                                               Foreground="{DynamicResource SubtleBrush}"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"/>
+                                    <!-- EXIF Temizleme Toggle -->
+                                    <ToggleButton x:Name="BtnStripExif"
+                                                  Width="24" Height="18"
+                                                  Margin="6,0,0,0"
+                                                  Padding="0"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="True"
+                                                  Style="{StaticResource ToggleButtonStyle}"
+                                                  Checked="BtnStripExif_Changed"
+                                                  Unchecked="BtnStripExif_Changed"
+                                                  ToolTip="EXIF verilerini temizle / Strip EXIF metadata">
+                                        <TextBlock Text="🛡️" FontSize="10"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                    </ToggleButton>
+                                </StackPanel>
+                                <ComboBox x:Name="CboFormat"
+                                          Height="30"
+                                          SelectionChanged="CboFormat_SelectionChanged">
+                                    <ComboBoxItem Content="JPEG" IsSelected="True"/>
+                                    <ComboBoxItem Content="PNG"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- ⚙ Profiles butonu -->
+                            <Button Grid.Column="4"
+                                    x:Name="BtnProfiles"
+                                    Height="30"
+                                    Padding="10,0"
+                                    VerticalAlignment="Bottom"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="BtnProfiles_Click">
+                                <TextBlock x:Name="LblProfilesBtn"
+                                           Text="⚙ Profiles"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </Button>
+                        </Grid>
+
+                        <!-- 2. Satır: Width / Height / JPEG Quality / Aspect Mode -->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Width -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock x:Name="LblWidth"
+                                           Text="Width (px)"
+                                           Foreground="{DynamicResource SubtleBrush}"
+                                           FontSize="11"
+                                           Margin="0,0,0,3"/>
+                                <TextBox x:Name="TxtWidth"
+                                         Height="30"
+                                         Text="1200"
+                                         TextChanged="Settings_Changed"/>
+                            </StackPanel>
+
+                            <!-- Height -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock x:Name="LblHeight"
+                                           Text="Height (px)"
+                                           Foreground="{DynamicResource SubtleBrush}"
+                                           FontSize="11"
+                                           Margin="0,0,0,3"/>
+                                <TextBox x:Name="TxtHeight"
+                                         Height="30"
+                                         Text="1200"
+                                         TextChanged="Settings_Changed"/>
+                            </StackPanel>
+
+                            <!-- JPEG Quality -->
+                            <StackPanel Grid.Column="4">
+                                <TextBlock x:Name="LblQuality"
+                                           Text="Quality"
+                                           Foreground="{DynamicResource SubtleBrush}"
+                                           FontSize="11"
+                                           Margin="0,0,0,3"/>
+                                <TextBox x:Name="TxtQuality"
+                                         Height="30"
+                                         Text="90"
+                                         TextChanged="Settings_Changed"/>
+                            </StackPanel>
+
+                            <!-- Aspect Mode -->
+                            <StackPanel Grid.Column="6">
+                                <TextBlock x:Name="LblAspect"
+                                           Text="Aspect Mode"
+                                           Foreground="{DynamicResource SubtleBrush}"
+                                           FontSize="11"
+                                           Margin="0,0,0,3"/>
+                                <ComboBox x:Name="CboAspect"
+                                          Height="30"
+                                          SelectionChanged="CboAspect_SelectionChanged">
+                                    <ComboBoxItem Content="Crop" IsSelected="True"/>
+                                    <ComboBoxItem Content="Pad"/>
+                                    <ComboBoxItem Content="Stretch"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- ── DROP ZONE / THUMBNAILS ────────────────── -->
+                <Border Grid.Row="1"
+                        Style="{StaticResource PanelBorder}"
+                        Margin="0,0,0,8"
+                        AllowDrop="True">
+                    <Grid>
+                        <!-- Ortalanmış drop ipucu (fotoğraf yokken) -->
+                        <StackPanel x:Name="DropHint"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    IsHitTestVisible="False">
+                            <TextBlock x:Name="LblDropHint1"
+                                       Text="Drop images here or"
+                                       FontSize="15"
+                                       Foreground="{DynamicResource SubtleBrush}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="LblDropHintOr"
+                                       Text="click + to add files"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SubtleBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,4,0,0"
+                                       Visibility="Collapsed"/>
+                        </StackPanel>
+
+                        <!-- Thumbnail scroll alanı -->
+                        <ScrollViewer x:Name="ThumbScroll"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Visibility="Collapsed">
+                            <WrapPanel x:Name="ThumbPanel"
+                                       Orientation="Horizontal"
+                                       Margin="8"/>
+                        </ScrollViewer>
+
+                        <!-- Kalıcı + Ekle butonu (sağ alt — her zaman görünür) -->
+                        <Button x:Name="BtnBrowse"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Width="38" Height="38"
+                                Margin="0,0,8,8"
+                                Padding="0"
+                                Style="{StaticResource StandardButton}"
+                                Click="BtnBrowse_Click"
+                                ToolTip="Add images / Görsel ekle">
+                            <TextBlock x:Name="LblBrowse" Text="＋" FontSize="18"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- ── ÇIKTI + RENAME + BUTONLAR ─────────────── -->
+                <Border Grid.Row="2"
+                        Style="{StaticResource PanelBorder}"
+                        Padding="12,10">
+                    <StackPanel>
+                        <!-- Output klasörü satırı -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="36"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock x:Name="LblOutput"
+                                       Grid.Column="0"
+                                       Text="Output:"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"
+                                       Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBox x:Name="TxtOutputFolder"
+                                     Grid.Column="1"
+                                     Height="30"
+                                     IsReadOnly="True"
+                                     Background="{DynamicResource InputBgBrush}"
+                                     Foreground="{DynamicResource ForegroundBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush2}"/>
+                            <Button Grid.Column="3"
+                                    Height="30"
+                                    Width="36"
+                                    Padding="0"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="BtnSelectFolder_Click"
+                                    ToolTip="Select output folder">
+                                <Viewbox Width="15" Height="15" Stretch="Uniform">
+                                    <TextBlock Text="📁" FontSize="13"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Viewbox>
+                            </Button>
+                        </Grid>
+
+                        <!-- Rename / Preview butonları + Pad rengi -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <ToggleButton x:Name="BtnToggleRename"
+                                          Height="30"
+                                          Padding="10,0"
+                                          Style="{StaticResource ToggleButtonStyle}"
+                                          Checked="BtnToggleRename_Checked"
+                                          Unchecked="BtnToggleRename_Unchecked">
+                                <TextBlock x:Name="LblRenameBtn"
+                                           Text="✏ Rename"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnTogglePreview"
+                                          Height="30"
+                                          Padding="10,0"
+                                          Margin="8,0,0,0"
+                                          Style="{StaticResource ToggleButtonStyle}"
+                                          Checked="BtnTogglePreview_Checked"
+                                          Unchecked="BtnTogglePreview_Unchecked">
+                                <TextBlock x:Name="LblPreviewBtn"
+                                           Text="👁 Preview"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                            </ToggleButton>
+
+                            <Button x:Name="BtnWatermarkSettings"
+        Height="30"
+        Padding="10,0"
+        Margin="8,0,0,0"
+        Style="{StaticResource SecondaryButton}"
+        Click="BtnWatermarkSettings_Click">
+                                <TextBlock x:Name="LblWatermarkBtn"
+               Text="🎨 Watermark"
+               FontSize="13"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
+                            </Button>
+
+                            <!-- Pad rengi (sadece Pad modunda görünür) -->
+                            <StackPanel x:Name="PadColorPanel"
+                                        Orientation="Horizontal"
+                                        Margin="12,0,0,0"
+                                        Visibility="Collapsed"
+                                        VerticalAlignment="Center">
+                                <TextBlock x:Name="LblPadColor"
+                                           Text="Pad Color:"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,6,0"
+                                           Foreground="{DynamicResource SubtleBrush}"/>
+                                <ComboBox x:Name="CboPadColor"
+                                          Height="30"
+                                          Width="90"
+                                          SelectionChanged="CboPadColor_SelectionChanged">
+                                    <ComboBoxItem Content="White" IsSelected="True"/>
+                                    <ComboBoxItem Content="Black"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Rename Banner (Rename aktifken açılır) -->
+                        <Border x:Name="RenameBanner"
+                                Background="{DynamicResource DropZoneBrush}"
+                                BorderBrush="{DynamicResource BorderBrush2}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10,8"
+                                Margin="0,8,0,0"
+                                Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="LblBaseName"
+                                           Grid.Column="0"
+                                           Text="Base name:"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"
+                                           Foreground="{DynamicResource ForegroundBrush}"/>
+                                <TextBox x:Name="TxtBaseName"
+                                         Grid.Column="1"
+                                         Height="28"
+                                         Text=""
+                                         Background="{DynamicResource InputBgBrush}"
+                                         Foreground="{DynamicResource ForegroundBrush}"
+                                         BorderBrush="{DynamicResource BorderBrush2}"/>
+                                <TextBlock x:Name="LblRenameHint"
+                                           Grid.Column="2"
+                                           Text="Files will be saved as: product_1.jpg ..."
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource SubtleBrush}"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ── SAĞ: ÖNİZLEME + WATERMARK ──────────────────── -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Preview Panel -->
+                <Border x:Name="PreviewPanel"
+                        Grid.Row="0"
+                        Style="{StaticResource PanelBorder}"
+                        Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Önizleme görseli + Watermark overlay -->
+                        <Border Grid.Row="0"
+                                Background="{DynamicResource ThumbnailBgBrush}"
+                                CornerRadius="5,5,0,0"
+                                Cursor="Hand">
+                            <Grid>
+                                <TextBlock x:Name="LblPreviewHint"
+                                           Text="Select a thumbnail to preview"
+                                           Foreground="{DynamicResource SubtleBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           Margin="12"
+                                           FontSize="12"/>
+                                <Image x:Name="ImgPreview"
+                                       Stretch="Uniform"
+                                       Margin="4"
+                                       Visibility="Collapsed"/>
+                                <!-- Non-destructive watermark önizleme katmanı -->
+                                <Canvas x:Name="WatermarkOverlay"
+                                    Background="Transparent"
+                                    SizeChanged="WatermarkOverlay_SizeChanged"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Dosya adı -->
+                        <Border Grid.Row="1"
+                                Background="{DynamicResource PanelBgBrush}"
+                                BorderBrush="{DynamicResource BorderBrush2}"
+                                BorderThickness="0,1,0,0"
+                                Padding="8,6"
+                                CornerRadius="0,0,5,5">
+                            <TextBlock x:Name="LblPreviewFilename"
+                                       Text=""
+                                       Foreground="{DynamicResource SubtleBrush}"
+                                       FontSize="11"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                
+            </Grid>
+        </Grid>
+
+
+        <!-- ══════════════════════════════════════════════════
+             FOOTER
+        ══════════════════════════════════════════════════ -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource PanelBgBrush}"
+                BorderBrush="{DynamicResource BorderBrush2}"
+                BorderThickness="0,1,0,0">
+            <Grid Margin="16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Sol: durum metni + progress -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="LblStatus"
+                               Text="0 image(s) loaded"
+                               Foreground="{DynamicResource SubtleBrush}"
+                               VerticalAlignment="Center"/>
+                    <ProgressBar x:Name="PrgConvert"
+                                 Width="160" Height="8"
+                                 Margin="16,0,0,0"
+                                 Minimum="0" Maximum="100" Value="0"
+                                 Visibility="Collapsed"
+                                 Background="{DynamicResource BorderBrush2}"
+                                 Foreground="{DynamicResource AccentBrush}"/>
+                </StackPanel>
+
+                <!-- Sağ: Clear All + Convert -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Button x:Name="BtnClearAll"
+                            Height="30"
+                            Padding="14,0"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="BtnClearAll_Click">
+                        <TextBlock x:Name="LblClearAll" Text="Clear All"/>
+                    </Button>
+                    <Button x:Name="BtnConvert"
+                            Height="30"
+                            Padding="18,0"
+                            Margin="8,0,0,0"
+                            Style="{StaticResource StandardButton}"
+                            Click="BtnConvert_Click">
+                        <TextBlock x:Name="LblConvert" Text="✓ Convert"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
+
+
